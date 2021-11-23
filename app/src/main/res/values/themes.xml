@@ -1,0 +1,28 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.AwasGempaBumi" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#ff5252</item>
+        <item name="colorPrimaryVariant">#c50e29</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="fontFamily">@font/poppins_regular500</item>
+        <item name="actionBarTheme">@style/actionBarTheme</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#ff867f</item>
+        <item name="colorSecondaryVariant">#c50e29</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="fontFamily">@font/poppins_regular600</item>
+        <item name="android:titleTextStyle">@style/titleTextStyle</item>
+    </style>
+
+    <style name="titleTextStyle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">0.9dp</item>
+    </style>
+</resources>
