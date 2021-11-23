@@ -2,6 +2,7 @@ package io.chronostech.awasgempabumi
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -10,8 +11,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,17 +27,21 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 const val TAG = "Awas Gempa"
 const val LOCATION_PERMISSION_REQUEST = 62
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: EarthQuakeAdapter
 
-    private lateinit var viewModel: EarthQuakeViewModel
+    private  val viewModel : EarthQuakeViewModel by viewModels()
+    @Inject lateinit var mPref: SharedPreferences
 
     private var mMap: GoogleMap? = null
     private var lastKnownLocation: Location? = null
@@ -50,12 +55,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         if (checkLocationPermission()) setupMapView(savedInstanceState)
         setupRecyclerView()
 
-        val retrofitService = API.create()
-        val repository = EarthQuakeRepo(retrofitService)
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(repository)
-        ).get(EarthQuakeViewModel::class.java)
         viewModel.earthquakeList.observe(this, {
             if (it != null) adapter.setData(it)
         })

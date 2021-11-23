@@ -8,8 +8,9 @@ import io.chronostech.awasgempabumi.model.Infogempa
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
 
-class EarthQuakeRepo(private val retrofitService : API) {
+class EarthQuakeRepo @Inject constructor(private val retrofitService : API) {
     suspend fun getResponse(): Response<EarthQuakeResponse> = retrofitService.getResponse()
 }

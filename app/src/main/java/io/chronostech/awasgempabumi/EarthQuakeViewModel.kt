@@ -3,10 +3,13 @@ package io.chronostech.awasgempabumi
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.chronostech.awasgempabumi.model.Gempa
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class EarthQuakeViewModel constructor(private val repo:EarthQuakeRepo) : ViewModel() {
+@HiltViewModel
+class EarthQuakeViewModel @Inject constructor(private val repo:EarthQuakeRepo) : ViewModel() {
 
     val errorMessage = MutableLiveData<String>()
     val earthquakeList = MutableLiveData<List<Gempa>>()
