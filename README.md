@@ -7,7 +7,7 @@
 - Menampilkan data gempa terbaru sesuai dengan informasi dari BMKG
 - Menampilkan data gempa di sekitar user lewat peta
 
-![Screenshoot](https://github.com/andrea-liu87/awasgempabumi/marketing/ss1.png)
+![Screenshoot](https://github.com/andrea-liu87/awasgempabumi/blob/master/marketing/ss1.jpg)
 
 ### Next implementation
 - Show pin on map for gempa
