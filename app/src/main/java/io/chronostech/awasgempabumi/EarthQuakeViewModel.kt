@@ -1,6 +1,5 @@
 package io.chronostech.awasgempabumi
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +25,7 @@ class EarthQuakeViewModel @Inject constructor(private val repo:EarthQuakeRepo) :
             withContext(Dispatchers.Main){
                 if (response.isSuccessful){
                     val list = response.body()?.infogempa?.gempa
-                    earthquakeList.postValue(list)
+                    earthquakeList.postValue(list!!)
                     loading.value = false
                 } else {
                     onError("Error : ${response.errorBody()}")

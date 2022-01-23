@@ -5,19 +5,17 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.chronostech.awasgempabumi.databinding.ActivityMainBinding
-
+import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -26,22 +24,27 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
+import io.chronostech.awasgempabumi.databinding.ActivityMainBinding
+import io.chronostech.awasgempabumi.model.Gempa
 import javax.inject.Inject
 
 const val TAG = "Awas Gempa"
 const val LOCATION_PERMISSION_REQUEST = 62
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: EarthQuakeAdapter
 
-    private  val viewModel : EarthQuakeViewModel by viewModels()
-    @Inject lateinit var mPref: SharedPreferences
+    private val viewModel: EarthQuakeViewModel by viewModels()
+
+    @Inject
+    lateinit var mPref: SharedPreferences
 
     private var mMap: GoogleMap? = null
     private var lastKnownLocation: Location? = null
@@ -57,12 +60,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         viewModel.earthquakeList.observe(this, {
             if (it != null) adapter.setData(it)
+            mapLatLong(it)
         })
+
         viewModel.loading.observe(this, {
             if (!it) {
                 binding.swipeRefreshLayout.isRefreshing = false
             }
         })
+
         viewModel.getAllEarthquake()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -81,9 +87,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupAds() {
-        MobileAds.initialize(
-            this
-        ) { }
+        MobileAds.initialize(this) {
+            val adRequest = AdRequest.Builder().build()
+            binding.adView.loadAd(adRequest)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -117,7 +124,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap = googleMap
         mMap?.isMyLocationEnabled = true
-
+        mMap?.setOnCameraMoveListener {
+            viewModel.earthquakeList.value?.let { mapLatLong(it) }
+        }
         showDeviceLocation()
     }
 
@@ -134,7 +143,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                     LatLng(
                                         lastKnownLocation!!.latitude,
                                         lastKnownLocation!!.longitude
-                                    ), 12f
+                                    ), 8f
                                 )
                             )
                         }
@@ -145,6 +154,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    private fun mapLatLong(listGempa: List<Gempa>) {
+        val boundaryMap = mMap?.projection?.visibleRegion?.latLngBounds ?: return
+
+        listGempa.forEach {
+            val coordinate = it.coordinates!!.split(",")
+            val latitude: Double = coordinate.get(0).toDouble()
+            val longitude: Double = coordinate.get(1).toDouble()
+            val latLng = LatLng(latitude, longitude)
+
+            if (boundaryMap.contains(latLng)) {
+                mMap!!.addMarker(
+                    MarkerOptions().position(latLng)
+                        .title(it.magnitude)
+                )
+            }
         }
     }
 
@@ -190,5 +217,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             }
         }
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        TODO("Not yet implemented")
     }
 }
