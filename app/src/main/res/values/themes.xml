@@ -25,4 +25,13 @@
         <item name="android:textStyle">bold</item>
         <item name="android:lineSpacingExtra">0.9dp</item>
     </style>
+
+    <style name="Theme.AwasGempaBumi.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AwasGempaBumi.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.AwasGempaBumi.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

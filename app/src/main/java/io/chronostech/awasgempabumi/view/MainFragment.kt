@@ -1,4 +1,4 @@
-package io.chronostech.awasgempabumi
+package io.chronostech.awasgempabumi.view
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -7,12 +7,12 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
+import android.view.*
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
@@ -27,21 +27,26 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
-import io.chronostech.awasgempabumi.databinding.ActivityMainBinding
+import io.chronostech.awasgempabumi.EarthQuakeAdapter
+import io.chronostech.awasgempabumi.R
+import io.chronostech.awasgempabumi.databinding.FragmentMainBinding
 import io.chronostech.awasgempabumi.model.Gempa
+import io.chronostech.awasgempabumi.viewmodel.DetailViewModel
+import io.chronostech.awasgempabumi.viewmodel.EarthQuakeViewModel
 import javax.inject.Inject
 
-const val TAG = "Awas Gempa"
 const val LOCATION_PERMISSION_REQUEST = 62
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MainFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    private lateinit var binding: ActivityMainBinding
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel by activityViewModels<EarthQuakeViewModel>()
+    private val detailViewModel by activityViewModels<DetailViewModel>()
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: EarthQuakeAdapter
-
-    private val viewModel: EarthQuakeViewModel by viewModels()
 
     @Inject
     lateinit var mPref: SharedPreferences
@@ -50,10 +55,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var lastKnownLocation: Location? = null
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         if (checkLocationPermission()) setupMapView(savedInstanceState)
         setupRecyclerView()
@@ -80,27 +93,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setupAds()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.main_menu, menu)
-        return true
     }
 
     private fun setupAds() {
-        MobileAds.initialize(this) {
+        MobileAds.initialize(requireContext()) {
             val adRequest = AdRequest.Builder().build()
             binding.adView.loadAd(adRequest)
         }
     }
 
     private fun setupRecyclerView() {
-        adapter = EarthQuakeAdapter(applicationContext)
+        adapter = EarthQuakeAdapter(requireContext(),
+            object : EarthQuakeAdapter.ItemListener {
+                override fun itemClickListener(gempa: Gempa) {
+                    detailViewModel.gempa.value = gempa
+                    NavHostFragment.findNavController(this@MainFragment)
+                        .navigate(R.id.action_mainFragment_to_detailFragment)
+                }
+            })
         binding.recyclerView.adapter = adapter
-        layoutManager = LinearLayoutManager(this.applicationContext)
+        layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setHasFixedSize(true)
         val dividerItemDecoration =
-            DividerItemDecoration(this.applicationContext, DividerItemDecoration.VERTICAL)
+            DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
     }
 
@@ -108,7 +127,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.onResume()
         try {
-            MapsInitializer.initialize(applicationContext)
+            MapsInitializer.initialize(requireContext())
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -120,7 +139,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
      */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
         mMap = googleMap
         mMap?.isMyLocationEnabled = true
@@ -134,7 +154,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         try {
             if (checkLocationPermission()) {
                 val locationResult = fusedLocationProviderClient.lastLocation
-                locationResult.addOnCompleteListener(this) { task ->
+                locationResult.addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
                         lastKnownLocation = task.result
                         if (lastKnownLocation != null) {
@@ -177,9 +197,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private fun checkLocationPermission(): Boolean {
         if (ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_COARSE_LOCATION
+                requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(
@@ -206,7 +226,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     setupMapView(null)
                 } else {
                     Toast.makeText(
-                        this.applicationContext,
+                        requireContext(),
                         "Ijin lokasi aplikasi ditolak",
                         Toast.LENGTH_LONG
                     ).show()
@@ -221,5 +241,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMarkerClick(marker: Marker): Boolean {
         TODO("Not yet implemented")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

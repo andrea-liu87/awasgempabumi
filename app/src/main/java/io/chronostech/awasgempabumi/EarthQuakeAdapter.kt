@@ -11,7 +11,10 @@ import java.util.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class EarthQuakeAdapter(val context: Context) :
+class EarthQuakeAdapter(
+    val context: Context,
+    val itemClickListener: ItemListener
+) :
     RecyclerView.Adapter<EarthQuakeAdapter.EarthQuakeViewHolder>() {
     private var data = listOf<Gempa>()
 
@@ -40,6 +43,8 @@ class EarthQuakeAdapter(val context: Context) :
         val timeMillisNow = System.currentTimeMillis()
         val string = Duration.minutes((timeMillisNow - timeMillis) / 60000)
         holder.binding.tvTime.text = "$string ago"
+
+        holder.itemView.setOnClickListener { itemClickListener.itemClickListener(earthquake) }
     }
 
     override fun getItemCount(): Int {
@@ -54,4 +59,8 @@ class EarthQuakeAdapter(val context: Context) :
 
     class EarthQuakeViewHolder(val binding: ListitemEarthquakeBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    interface ItemListener {
+        fun itemClickListener(gempa: Gempa)
+    }
 }
