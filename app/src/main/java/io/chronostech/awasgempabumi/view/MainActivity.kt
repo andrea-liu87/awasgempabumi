@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.detailFragment) {
                 supportActionBar?.hide()
+            } else {
+                supportActionBar?.show()
             }
         }
     }
