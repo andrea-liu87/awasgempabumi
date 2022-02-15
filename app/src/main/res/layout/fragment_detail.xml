@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:text="Data Gempa"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/btn_back"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:foreground="?attr/selectableItemBackground"
-                    android:paddingHorizontal="12dp"
+                    android:padding="12dp"
                     android:src="@drawable/ic_share"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -66,6 +66,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:id="@+id/cl_frame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/app_bar">
@@ -78,11 +79,12 @@
             android:paddingTop="16dp"
             android:paddingBottom="8dp"
             android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Kabupaten Jayapura, Papua" />
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/map_view"
@@ -90,6 +92,216 @@
             android:layout_height="240dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_detail_place" />
+
+        <LinearLayout
+            android:id="@+id/ll_magnitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            app:layout_constraintTop_toBottomOf="@id/map_view">
+
+            <TextView
+                android:id="@+id/tv_magnitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_red"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="4.00" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:text="Magnitudo"
+                android:textColor="@color/black_text_profile"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="12dp"
+            android:background="@color/browser_actions_divider_color"
+            app:layout_constraintTop_toBottomOf="@id/ll_magnitude" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:paddingStart="20dp"
+            app:layout_constraintEnd_toStartOf="@id/guidelinevertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider">
+
+            <ImageView
+                android:id="@+id/iv_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_label_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="8dp"
+                android:text="Waktu Gempa"
+                android:textColor="@color/black_text_profile"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_clock"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_time_gempa"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="12dp"
+                android:textColor="@color/black_text_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_label_time"
+                app:layout_constraintTop_toBottomOf="@id/tv_label_time" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_latlon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+            android:paddingStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guidelinevertical"
+            app:layout_constraintTop_toTopOf="@id/cl_time">
+
+            <ImageView
+                android:id="@+id/iv_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_label_latlon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="8dp"
+                android:text="Posisi Geografis"
+                android:textColor="@color/black_text_profile"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_location"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_latlon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="12dp"
+                android:textColor="@color/black_text_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_label_latlon"
+                app:layout_constraintTop_toBottomOf="@id/tv_label_latlon" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_depth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:paddingStart="20dp"
+            app:layout_constraintEnd_toStartOf="@id/guidelinevertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_time">
+
+            <ImageView
+                android:id="@+id/iv_depth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_building"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_label_depth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="8dp"
+                android:text="Kedalaman"
+                android:textColor="@color/black_text_profile"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_depth"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_depth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="12dp"
+                android:textColor="@color/black_text_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tv_label_depth"
+                app:layout_constraintTop_toBottomOf="@id/tv_label_depth" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_potensi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:paddingStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guidelinevertical"
+            app:layout_constraintTop_toBottomOf="@id/cl_latlon">
+
+            <ImageView
+                android:id="@+id/iv_danger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_danger"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_potensi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="1dp"
+                android:paddingStart="8dp"
+                android:text="Potensi TSUNAMI !"
+                android:textColor="@color/red_main"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_danger"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"
@@ -100,6 +312,14 @@
             ads:adSize="BANNER"
             ads:adUnitId="ca-app-pub-9870070910946608/9007507771"
             ads:layout_constraintBottom_toBottomOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelinevertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

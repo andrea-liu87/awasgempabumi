@@ -43,4 +43,7 @@ class Gempa {
     @SerializedName("Dirasakan")
     @Expose
     var dirasakan: String? = null
+
+    @SerializedName("Potensi")
+    var potensi: String? = null
 }

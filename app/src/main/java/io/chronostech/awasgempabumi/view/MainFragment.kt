@@ -9,7 +9,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
@@ -68,7 +69,11 @@ class MainFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (checkLocationPermission()) setupMapView(savedInstanceState)
+        if (allPermissionsGranted()) {
+            setupMapView(savedInstanceState)
+        } else {
+            permReqLauncher.launch(REQUIRED_PERMISSIONS)
+        }
         setupRecyclerView()
 
         viewModel.earthquakeList.observe(this, {
@@ -152,7 +157,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
     private fun showDeviceLocation() {
         try {
-            if (checkLocationPermission()) {
+            if (allPermissionsGranted()) {
                 val locationResult = fusedLocationProviderClient.lastLocation
                 locationResult.addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
@@ -195,49 +200,27 @@ class MainFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         }
     }
 
-    private fun checkLocationPermission(): Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ), LOCATION_PERMISSION_REQUEST
-            )
-            return false
-        }
-        return true
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(
+            requireContext(), it
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            LOCATION_PERMISSION_REQUEST -> {
-                if ((grantResults.isNotEmpty() &&
-                            grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                ) {
-                    setupMapView(null)
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Ijin lokasi aplikasi ditolak",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                return
+    private val permReqLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value
             }
-            else -> {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            if (granted) {
+                setupMapView(null)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
-    }
 
     override fun onMarkerClick(marker: Marker): Boolean {
         TODO("Not yet implemented")
@@ -246,5 +229,12 @@ class MainFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
     }
 }

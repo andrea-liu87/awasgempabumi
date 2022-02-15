@@ -1,8 +1,6 @@
 package io.chronostech.awasgempabumi
 
 import io.chronostech.awasgempabumi.model.EarthQuakeResponse
-import io.chronostech.awasgempabumi.model.Infogempa
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,13 +8,16 @@ import retrofit2.http.GET
 
 interface API {
     @GET("gempadirasakan.json")
-    suspend fun getResponse() : Response<EarthQuakeResponse>
+    suspend fun getResponse(): Response<EarthQuakeResponse>
+
+    @GET("gempaterkini.json")
+    suspend fun getResponseBigMagnitude(): Response<EarthQuakeResponse>
 
     companion object {
-        var apiInterface : API? = null
+        var apiInterface: API? = null
         var BASE_URL = "https://data.bmkg.go.id/DataMKG/TEWS/"
 
-        fun create() : API {
+        fun create(): API {
             if (apiInterface == null) {
                 val retrofit = Retrofit.Builder()
                     .addConverterFactory(GsonConverterFactory.create())
